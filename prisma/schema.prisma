@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+}
+generator client {
+  provider = "prisma-client"
+  output     = "./generated"
+  engineType = "client"
+}
+
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  auth          Auth?
+  conversations Conversation[]  
+  sessions      Session[]
+}
+
+model Auth{
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  email     String   @unique
+  password  String
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  refreshToken String  @unique
+  createdAt DateTime @default(now())
+  expiredAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+
+model Conversation {
+  id        String    @id @default(cuid())
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String
+  
+  messages  Message[]
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  role           Role
+  content        String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
