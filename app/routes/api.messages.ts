@@ -1,6 +1,7 @@
 import { handleMessage } from "../services/chat.server";
 import type { ActionFunction } from "react-router";
 
+
 export async function loader() {
   return Response.json(
     { error: "Method Not Allowed" },
