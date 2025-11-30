@@ -1,5 +1,7 @@
 import prisma from "../lib/db";
 import bcrypt from "bcryptjs";
+import {verifyToken} from "../utils/jwt.server";
+import type { JwtPayload } from "jsonwebtoken";
 
 
 //REGISTER
@@ -32,4 +34,18 @@ export async function loginUser(email: string, password: string) {
     if(!ok) throw new Error("Email hoac mat khau sai");
 
     return user;
+}
+
+export function requireAuth(request: Request){
+    const authHeader = request.headers.get("Authorization");
+    if(!authHeader) throw new Error("Loi uy xac thuc");
+
+    const token = authHeader.replace("Bearer ", "");
+
+    try{
+        const decode = verifyToken(token) as JwtPayload & {id: number, email: string};
+        return decode;
+    }catch(err){
+        throw new Error("Token khong dung");
+    }
 }

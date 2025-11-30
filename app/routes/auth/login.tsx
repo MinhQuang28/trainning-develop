@@ -7,17 +7,45 @@ export default function login() {
         rememberMe: false
     });
 
-    const handleSubmit = () => {
-        console.log("Dang nhap: ", formData);
-    };
+    const handleSubmit = async () => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-    const handleChange = (e) => {
-        const {name, value, type, checked } = e.taget;
-        setFormData({
-            ...formData,
-            [name]: type === "checkbox" ? checked : value
-        });
-    };
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Đăng nhập thất bại");
+        return;
+      }
+
+      // Lưu token vào localStorage
+      localStorage.setItem("token", data.token);
+
+      alert("Đăng nhập thành công!");
+      
+      // Chuyển hướng sang Home
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert("Có lỗi xảy ra, vui lòng thử lại.");
+    }
+  };
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center p-4">

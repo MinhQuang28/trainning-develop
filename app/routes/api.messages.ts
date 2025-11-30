@@ -1,6 +1,6 @@
 import { handleMessage } from "../services/chat.server";
 import type { ActionFunction } from "react-router";
-
+import {requireAuth} from "../services/auth.server";
 
 export async function loader() {
   return Response.json(
@@ -13,6 +13,9 @@ export const action: ActionFunction = async ({ request }) => {
   console.log("📨 API /api/messages - action được gọi");
   
   try {
+
+    const user = requireAuth(request);
+
     const { conversationId, message } = await request.json();
 
     if (!conversationId || !message) {
@@ -22,7 +25,7 @@ export const action: ActionFunction = async ({ request }) => {
       );
     }
 
-    const result = await handleMessage(Number(conversationId), message);
+    const result = await handleMessage(Number(conversationId), message, user.id);
     console.log("✅ Result:", result);
 
     return Response.json(result);

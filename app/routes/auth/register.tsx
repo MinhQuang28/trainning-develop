@@ -8,13 +8,41 @@ export default function register() {
         confirmPassword: ""
     });
 
-    const handleSubmit = () =>{
-        if(formData.password !== formData.confirmPassword){
-            alert("PassWord Incorect!");
-            return;
+    const handleSubmit = async () => {
+      if (formData.password !== formData.confirmPassword) {
+        alert("Mật khẩu không khớp!");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || "Đăng ký thất bại");
+          return;
         }
-        console.log("Dang ky", formData);
+
+        alert("Đăng ký thành công!");
+        // Chuyển hướng sang login
+        window.location.href = "/login";
+      } catch (err) {
+        console.error(err);
+        alert("Có lỗi xảy ra, vui lòng thử lại.");
+      }
     };
+
 
     const handleChange = (e) => {
         const {name, value} = e.target;

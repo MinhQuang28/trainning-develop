@@ -43,15 +43,24 @@ async function updateConversationTitle(conversationId: number, firstMessage: str
 }
 
 
-export async function handleMessage(conversationId: number, userContent: string) {
+export async function handleMessage(
+  conversationId: number,
+  userContent: string,
+  userId: number // thêm userId
+) {
   const content = userContent.trim();
   if (!content) throw new Error("Tin nhắn rỗng");
 
-  console.log("🔧 handleMessage bắt đầu:", { conversationId, userContent });
+  console.log("🔧 handleMessage bắt đầu:", { conversationId, userContent, userId });
+
+  // 🔹 Kiểm tra conversation có thuộc user không
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId, userId },
+  });
+  if (!conversation) throw new Error("Conversation không tồn tại hoặc không thuộc user");
 
   console.log("💾 Lưu tin nhắn user...");
   const userMessage = await addMessage(conversationId, "user", content);
-  console.log("✅ Đã lưu tin nhắn user");
 
   console.log("📜 Lấy lịch sử tin nhắn...");
   const history = await getMessageHistory(conversationId);
@@ -69,25 +78,25 @@ export async function handleMessage(conversationId: number, userContent: string)
   ];
 
   let assistantMessage;
-  
+
   try {
     console.log("🤖 Gọi AI...");
     const aiContent = await getAIResponseWithHistory(messagesForAI);
     assistantMessage = await addMessage(conversationId, "assistant", aiContent);
-    
+
   } catch (error) {
     console.error("❌ Lỗi khi gọi AI:", error);
-    
-    console.error("Ollama error:", error);
     assistantMessage = await addMessage(
       conversationId,
       "assistant",
       "Xin lỗi, AI hiện không phản hồi được."
     );
   }
+
   await updateConversationTitle(conversationId, content);
 
-  return { user: userMessage, 
-    assistant: assistantMessage 
-    };
+  return {
+    user: userMessage,
+    assistant: assistantMessage,
+  };
 }
