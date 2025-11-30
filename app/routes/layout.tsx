@@ -1,14 +1,19 @@
 import { Outlet, NavLink, Link, useLoaderData } from "react-router";
 import { Plus, MessageSquare, Menu } from "lucide-react"; 
 import { useState } from "react";
+import { getAuthToken } from "~/services/auth.server";
 import { prisma } from "~/utils/prisma"; 
 
+export async function loader({ request }:any) {
+  const auth = getAuthToken(request);
 
-export async function loader() {
-  const DUMMY_USER_ID = "user-default-001"; 
+  if (auth.isGuest || !auth.userId) {
+    return { dbChats: [] };
+  }
+
   try {
     const dbChats = await prisma.conversation.findMany({
-      where: { userId: DUMMY_USER_ID },
+      where: { userId: auth.userId },
       orderBy: { updatedAt: "desc" },
       select: { id: true, title: true }
     });
@@ -17,36 +22,35 @@ export async function loader() {
     return { dbChats: [] };
   }
 }
-
 export default function AppLayout() {
   const { dbChats } = useLoaderData<typeof loader>();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   
   return (
-    <div className="flex h-screen bg-slate-900 text-slate-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-white text-slate-900 font-sans overflow-hidden">
       <aside 
         className={`${
           isSidebarOpen ? "w-64" : "w-0"
-        } bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 ease-in-out border-r border-slate-800 shrink-0 relative`}
+        } bg-white text-slate-900 flex flex-col transition-all duration-300 ease-in-out border-r border-gray-200 shrink-0 relative`}
       >
         <div className="p-3">
           <Link 
             to="/" 
-            className="flex items-center gap-2 px-3 py-3 rounded-lg border border-slate-700 hover:bg-slate-800 text-white transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-3 rounded-lg border border-blue-200 hover:bg-blue-50 text-blue-600 transition-colors cursor-pointer font-medium"
           >
             <Plus size={18} />
-            <span className="font-medium text-sm truncate">Cuộc trò chuyện mới</span>
+            <span className="truncate text-sm">Cuộc trò chuyện mới</span>
           </Link>
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-hide">
              {dbChats.length === 0 ? (
-                 <div className="px-4 py-10 text-center text-xs text-slate-600">
+                 <div className="px-4 py-10 text-center text-xs text-gray-400">
                     Chưa có lịch sử
                  </div>
              ) : (
                  <>
-                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Gần đây</div>
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gần đây</div>
                     {dbChats.map((chat) => (
                         <NavLink
                         key={chat.id}
@@ -55,7 +59,7 @@ export default function AppLayout() {
                             `flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
                             isActive 
                                 ? "bg-blue-600 text-white font-medium" 
-                                : "hover:bg-slate-800 text-slate-300"
+                                : "hover:bg-blue-50 text-slate-900"
                             }`
                         }
                         >
@@ -68,9 +72,9 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-900">
-        <div className="p-2 border-b border-slate-800 flex items-center gap-2 lg:hidden">
-            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-800 rounded-md text-white">
+      <main className="flex-1 flex flex-col min-w-0 bg-white">
+        <div className="p-2 border-b border-gray-200 flex items-center gap-2 lg:hidden">
+            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-blue-50 rounded-md text-blue-600">
                 <Menu size={20} />
             </button>
         </div>

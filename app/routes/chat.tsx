@@ -183,19 +183,19 @@ export default function ChatRoute() {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-100">
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-slate-700">
+    <div className="flex flex-col h-full bg-white text-black">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-300">
         {messages.map((msg, index) => (
           <div key={index} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 ${msg.role === "user" ? "bg-blue-600" : "bg-emerald-600"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-emerald-500 text-white"}`}>
               {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
             </div>
             <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                 msg.role === "user" 
-                ? "bg-slate-800 text-slate-100 rounded-tr-none" 
-                : "bg-transparent text-slate-200"
+                ? "bg-blue-50 text-black rounded-tr-none" 
+                : "bg-gray-100 text-slate-900"
             }`}>
-              <div className="prose prose-invert prose-sm max-w-none break-words">
+              <div className="prose prose-sm max-w-none break-words">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {msg.content}
                 </ReactMarkdown>
@@ -205,33 +205,27 @@ export default function ChatRoute() {
         ))}
         {isGenerating && messages[messages.length-1]?.role === 'user' && (
             <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shrink-0 mt-1">
-                    <Bot size={16} className="animate-pulse" />
+                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-1 animate-pulse text-white">
+                    <Bot size={16} />
                 </div>
-                <div className="text-slate-500 text-sm mt-2">Đang suy nghĩ...</div>
+                <div className="text-gray-500 text-sm mt-2">Đang suy nghĩ...</div>
             </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-slate-900 border-t border-slate-800 shrink-0 z-10">
+      <div className="p-4 bg-white border-t border-gray-200 shrink-0 z-10">
         <form onSubmit={(e) => { e.preventDefault(); runStream(input); setInput(""); }} className="relative max-w-3xl mx-auto">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Nhập tin nhắn..."
-            className="w-full py-4 pl-6 pr-14 bg-slate-800 text-white rounded-full border border-slate-700 focus:border-blue-500 outline-none shadow-lg transition-all"
+            className="w-full py-4 pl-6 pr-14 bg-white text-black rounded-full border border-blue-300 focus:border-blue-500 outline-none shadow-sm transition-all"
             disabled={isGenerating}
           />
-          {isGenerating ? (
-            <button type="button" onClick={() => abortControllerRef.current?.abort()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-red-400 hover:text-red-500">
-                <StopCircle size={20} />
-            </button>
-          ) : (
-            <button type="submit" disabled={!input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50">
-                <Send size={20} />
-            </button>
-          )}
+          <button type="submit" disabled={!input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50">
+              <Send size={20} />
+          </button>
         </form>
       </div>
     </div>
