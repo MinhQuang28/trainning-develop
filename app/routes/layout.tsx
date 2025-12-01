@@ -76,7 +76,9 @@ export default function Layout() {
             conversations.map((c) => (
               <button
                 key={c.id}
-                onClick={() => navigate(`/chat/${c.id}`)}
+                onClick={() =>{
+                  window.location.href = `/chat/${c.id}`;
+                }}
                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-800 transition-colors text-left group ${
                   currentChatId === c.id ? "bg-gray-800 ring-1 ring-gray-700" : ""
                 }`}

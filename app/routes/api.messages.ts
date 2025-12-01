@@ -13,10 +13,8 @@ export const action: ActionFunction = async ({ request }) => {
   console.log("📨 API /api/messages - action được gọi");
   
   try {
-
-    const user = requireAuth(request);
-
-    const { conversationId, message } = await request.json();
+    const body = await request.json();
+    const { conversationId, message, token } = body;
 
     if (!conversationId || !message) {
       return Response.json(
@@ -24,6 +22,14 @@ export const action: ActionFunction = async ({ request }) => {
         { status: 400 }
       );
     }
+
+    const authRequest = new Request(request.url, {
+      headers: new Headers({
+        "Authorization": `Bearer ${token}`
+      })
+    });
+
+    const user = requireAuth(authRequest);
 
     const result = await handleMessage(Number(conversationId), message, user.id);
     console.log("✅ Result:", result);

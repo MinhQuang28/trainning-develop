@@ -2,6 +2,7 @@
 import {
   useLoaderData,
   type LoaderFunction,
+  useFetcher,
 } from "react-router";
 import  prisma  from "../lib/db";
 import { useRef, useState, useEffect } from "react";
@@ -38,6 +39,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function ChatRoute() {
   const conversation = useLoaderData() as any;
+  const fetcher = useFetcher();
 
   // Khai báo kiểu rõ ràng → hết lỗi prev any
   const [messages, setMessages] = useState<Message[]>(
@@ -50,13 +52,42 @@ export default function ChatRoute() {
   );
 
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  //const [isTyping, setIsTyping] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+
+  const isTyping = fetcher.state !== "idle";
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Lắng nghe kết quả từ fetcher
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data.assistant) {
+        const aiMessage: Message = {
+          id: fetcher.data.assistant.id.toString(),
+          content: fetcher.data.assistant.content,
+          role: "assistant",
+          timestamp: new Date(fetcher.data.assistant.createdAt),
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+
+      // xu ly loi 
+      if (fetcher.data.error) {
+        const errorMessage: Message = {
+          id: Date.now().toString(),
+          content: `Lỗi: ${fetcher.data.error}. Vui lòng thử lại.`,
+          role: "assistant",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      }
+    }
+  }, [fetcher.state, fetcher.data]);
 
     const handleSend = async () => {
     if (!input.trim() || isTyping) return;
@@ -71,45 +102,22 @@ export default function ChatRoute() {
     setMessages(prev => [...prev, userMessage]);
     const textToSend = input.trim();
     setInput("");
-    setIsTyping(true);
 
     const token = localStorage.getItem("token");
+    console.log("bi chan o dau")
 
-    try {
-        const res = await fetch("/api/messages", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`,  },
-            body: JSON.stringify({
-                conversationId: conversation.id,
-                message: textToSend,
-            }),
-        });
-
-        const data = await res.json();
-        
-        if (data.assistant) {
-        const aiMessage: Message = {
-            id: data.assistant.id.toString(),
-            content: data.assistant.content,
-            role: "assistant",
-            timestamp: new Date(data.assistant.createdAt),
-        };
-        
-        setMessages(prev => [...prev, aiMessage]);
-        } 
-    }catch (err) {
-        console.error("❌ Lỗi khi gọi API:", err);
-        setMessages(prev => [
-            ...prev, 
-            {
-                id: Date.now().toString(),
-                content: `Lỗi: ${err instanceof Error ? err.message : "Không xác định"}. Vui lòng thử lại.`,
-                role: "assistant",
-                timestamp: new Date(),
-                },
-            ]);
-        }
-        setIsTyping(false);
+    fetcher.submit(
+      {
+        conversationId: conversation.id,
+        message: textToSend,
+        token: token || "",
+      },
+      {
+        method: "POST",
+        action: "/api/messages",
+        encType: "application/json",
+      }
+    );
     };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
