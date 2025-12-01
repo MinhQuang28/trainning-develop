@@ -1,21 +1,16 @@
 import { prisma } from "~/utils/prisma";
 
-const DUMMY_USER_ID = "user-default-001";
 const OLLAMA_API_URL = "http://localhost:11434/api/chat";
-const MODEL_NAME = "gpt-oss:20b-cloud"; 
+const MODEL_NAME = "gpt-oss:120b-cloud"; 
 
-export async function createChatSession(prompt: string) {
-  let user = await prisma.user.findUnique({ where: { id: DUMMY_USER_ID } });
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        id: DUMMY_USER_ID,
-        name: "User Mặc Định",
-        auth: { create: { email: "default@test.com", password: "123" } }
-      },
-    });
-  }
+const SYSTEM_PROMPT = `
+You are a helpful AI assistant.
+- Answer in Vietnamese unless asked otherwise.
+- Use Markdown for code blocks.
+- Be concise.
+`;
 
+export async function createChatSession(prompt: string, userId: string) {
   const chatId = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   const title = prompt.slice(0, 40) + "...";
 
@@ -23,7 +18,7 @@ export async function createChatSession(prompt: string) {
     data: {
       id: chatId,
       title,
-      userId: user.id
+      userId: userId 
     }
   });
 
@@ -40,10 +35,13 @@ export async function streamChatResponse(chatId: string) {
     orderBy: { createdAt: "asc" },
   });
 
-  const ollamaMessages = history.map((msg) => ({
-    role: msg.role === "USER" ? "user" : "assistant",
-    content: msg.content,
-  }));
+  const ollamaMessages = [
+    { role: "system", content: SYSTEM_PROMPT },
+    ...history.map((msg) => ({
+      role: msg.role === "USER" ? "user" : "assistant",
+      content: msg.content,
+    }))
+  ];
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -61,7 +59,7 @@ export async function streamChatResponse(chatId: string) {
           }),
         });
 
-        if (!response.body) throw new Error("Ollama connection failed");
+        if (!response.body) throw new Error("Ollama failed");
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
 
@@ -69,7 +67,7 @@ export async function streamChatResponse(chatId: string) {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n").filter((line) => line.trim() !== "");
+          const lines = chunk.split("\n").filter(l => l.trim() !== "");
           
           for (const line of lines) {
             try {
