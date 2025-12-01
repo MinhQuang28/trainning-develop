@@ -50,11 +50,6 @@ export type User = Prisma.UserModel
  */
 export type Auth = Prisma.AuthModel
 /**
- * Model Session
- * 
- */
-export type Session = Prisma.SessionModel
-/**
  * Model Conversation
  * 
  */

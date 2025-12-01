@@ -5,4 +5,7 @@ export default [
     index("routes/home.tsx"),
     route("c/:chatId", "routes/chat.tsx"), 
   ]),
+  route("login", "routes/login.tsx"),
+  route("register", "routes/register.tsx"),
+  route("logout", "routes/logout.tsx"),
 ] satisfies RouteConfig;

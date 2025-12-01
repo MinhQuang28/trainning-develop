@@ -53,7 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Auth: 'Auth',
-  Session: 'Session',
   Conversation: 'Conversation',
   Message: 'Message'
 } as const
@@ -88,21 +87,12 @@ export const AuthScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   email: 'email',
-  password: 'password'
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AuthScalarFieldEnum = (typeof AuthScalarFieldEnum)[keyof typeof AuthScalarFieldEnum]
-
-
-export const SessionScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  refreshToken: 'refreshToken',
-  createdAt: 'createdAt',
-  expiredAt: 'expiredAt'
-} as const
-
-export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
 export const ConversationScalarFieldEnum = {

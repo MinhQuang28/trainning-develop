@@ -1,25 +1,28 @@
-import { Outlet, NavLink, Link, useLoaderData } from "react-router";
-import { Plus, MessageSquare, Menu } from "lucide-react"; 
+import { Outlet, NavLink, Link, useLoaderData, Form } from "react-router"; 
+import { Plus, MessageSquare, Menu, LogOut, User as UserIcon } from "lucide-react"; 
 import { useState } from "react";
-import { prisma } from "~/utils/prisma"; 
+import { prisma } from "~/utils/prisma";
+import { requireUserId } from "~/services/session.server"; 
 
+export async function loader({ request }: any) {
+  const userId = await requireUserId(request); 
 
-export async function loader() {
-  const DUMMY_USER_ID = "user-default-001"; 
-  try {
-    const dbChats = await prisma.conversation.findMany({
-      where: { userId: DUMMY_USER_ID },
-      orderBy: { updatedAt: "desc" },
-      select: { id: true, title: true }
-    });
-    return { dbChats };
-  } catch (error) {
-    return { dbChats: [] };
-  }
+  const dbChats = await prisma.conversation.findMany({
+    where: { userId: userId }, 
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, title: true }
+  });
+
+  const user = await prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { name: true, auth: { select: { email: true } } }
+  });
+
+  return { dbChats, user };
 }
 
 export default function AppLayout() {
-  const { dbChats } = useLoaderData<typeof loader>();
+  const { dbChats, user } = useLoaderData<typeof loader>();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   
   return (
@@ -66,6 +69,26 @@ export default function AppLayout() {
                  </>
              )}
         </div>
+
+        <div className="p-3 border-t border-slate-800 bg-slate-900/50">
+            <div className="flex items-center gap-3 mb-3 px-2">
+                <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{user?.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.auth?.email}</p>
+                </div>
+            </div>
+            
+            <Form method="post" action="/logout">
+                <button type="submit" className="flex items-center gap-2 w-full px-3 py-2 text-red-400 hover:bg-slate-800 hover:text-red-300 rounded-lg transition-colors text-sm">
+                    <LogOut size={16} />
+                    <span>Đăng xuất</span>
+                </button>
+            </Form>
+        </div>
+
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 bg-slate-900">
