@@ -171,7 +171,7 @@ export default function ChatRoute() {
          const lastMsg = history[history.length - 1];
          
          if (lastMsg.role === 'user' && !hasTriggeredAutoRun.current) {
-             console.log("🚀 Auto-triggering stream...");
+             console.log("Auto-triggering stream...");
              hasTriggeredAutoRun.current = true;
              runStream(null);
          }
