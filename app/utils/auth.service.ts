@@ -1,21 +1,16 @@
 import { redirect } from "react-router";
-import { getUserIdFromCookies } from "./jwt.service";
 import prisma from "~/config/db";
+import { getSession } from "~/sessions.server";
 
 export async function requiresUserAuthentication(request: Request) {
-    const cookies = request.headers.get("Cookie");
+    const session = await getSession(request.headers.get("Cookie"));
+    console.log("🚀 ~ requiresUserAuthentication ~ session:", session.has("userId"));
 
-    if (!cookies) {
+    if (!session.has("userId")) {
         throw redirect("/login");
     }
 
-    const [refresh_token, access_token] = cookies.split("; ");
-
-    if (!access_token) {
-        throw redirect("/login");
-    }
-
-    const userId = getUserIdFromCookies(access_token);
+    const userId = session.get("userId");
 
     const user = await prisma.users.findUnique({
         where: {
@@ -27,7 +22,9 @@ export async function requiresUserAuthentication(request: Request) {
     });
 
     if (!user) {
-        throw redirect("/login");
+        throw redirect("/login", {
+            status: 403
+        });
     }
 
     return user;

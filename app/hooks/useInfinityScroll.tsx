@@ -56,6 +56,7 @@ function useInfinityScroll<T>({
         setNextCursor(initialCursor);
         setHasMore(initialHasMore);
     };
+    
     React.useEffect(() => {
         if (fetcher.data && fetcher.state === "idle") {
             const newData = findArrayByKey(fetcher.data.data, dataKey);

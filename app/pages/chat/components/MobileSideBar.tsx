@@ -4,11 +4,12 @@ import {
     PanelLeftCloseIcon,
     PanelRightCloseIcon,
     PenSquareIcon,
-    SearchIcon
+    SearchIcon,
+    XIcon
 } from "lucide-react";
 import React, { type Dispatch, type SetStateAction } from "react";
 import ThemeToggle from "~/components/ThemeToggle";
-import { SIDE_BAR_COLLAPSE_WIDTH, SIDE_BAR_EXPANDED_WIDTH } from "~/config/constant";
+import { MOBILE_SIDE_BAR_EXPANDED_WIDTH, SIDE_BAR_COLLAPSE_WIDTH, SIDE_BAR_EXPANDED_WIDTH } from "~/config/constant";
 import ThemeToggleCollapse from "~/components/ThemeToggleCollapse";
 import { useTheme } from "~/context/ThemeProvider";
 import clsx from "clsx";
@@ -16,7 +17,7 @@ import { Link, useFetcher, useNavigate } from "react-router";
 import DropdownMenu from "~/components/ui/DropDownMenu";
 import LoadingIndicator from "./LoadingIndicator";
 
-type SideBarProps = {
+type MobileSideBarProps = {
     open: boolean;
     onToggle: Dispatch<SetStateAction<boolean>>;
     conversations: { id: string; title: string }[];
@@ -29,7 +30,7 @@ type SideBarProps = {
     className?: string;
 };
 
-const SideBar = ({
+const MobileSideBar = ({
     open = true,
     conversations = [],
     activeConversationId,
@@ -40,7 +41,7 @@ const SideBar = ({
     isLoading,
     className,
     onToggle
-}: SideBarProps) => {
+}: MobileSideBarProps) => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const fetcher = useFetcher();
@@ -78,10 +79,11 @@ const SideBar = ({
     return (
         <div
             className={clsx(
-                "h-screen max-h-screen border-r border-r-border flex flex-col bg-surface transition-[width] ease-out duration-300 z-99",
-                className
+                "absolute h-screen max-h-screen border-r border-r-border flex flex-col bg-surface transition-all ease-out duration-300 z-99 ",
+                className,
+                open ? "" : "-translate-x-full"
             )}
-            style={{ width: `${open ? SIDE_BAR_EXPANDED_WIDTH : SIDE_BAR_COLLAPSE_WIDTH}` }}
+            style={{ width: MOBILE_SIDE_BAR_EXPANDED_WIDTH }}
         >
             {/* Header */}
             <div
@@ -93,12 +95,11 @@ const SideBar = ({
                     <BotIcon className="w-8 h-8" />
                     Script
                 </span>
-                <button className="bg-transparent cursor-pointer" onClick={() => onToggle(!open)}>
-                    {open ? (
-                        <PanelLeftCloseIcon className="w-5 h-5 text-gray-600" />
-                    ) : (
-                        <PanelRightCloseIcon className="w-5 h-5 text-gray-600" />
-                    )}
+                <button
+                    className="bg-transparent cursor-pointer text-text-primary"
+                    onClick={() => onToggle(!open)}
+                >
+                    <XIcon />
                 </button>
             </div>
 
@@ -187,4 +188,4 @@ const SideBar = ({
     );
 };
 
-export default SideBar;
+export default MobileSideBar;

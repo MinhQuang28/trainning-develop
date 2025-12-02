@@ -1,87 +1,149 @@
-# Welcome to React Router!
+# AI CHAT BOT
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Ai chat bot application was built with React, TypeScript and Vite.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## 🏗️ Project Structure
 
-## Features
+### Tech Stack
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- **Frontend Framework**: React 19.1.1 + TypeScript 5.9.2
+- **Build Tool**: Vite 7.1.7
+- **Styling**: Tailwind CSS 4.1.13 + CSS Variables
+- **State Management**: React Context API
+- **Routing**: React Router v7
+- **Authentication**: JWT
+- **Icons**: Lucide React
 
-## Getting Started
+### Folder Structure
 
-### Installation
+```
+app/
+├── api/                 # API route
+├── components/           # Reusable UI components
+│   └── ui/              # Base UI components (Button, Input, etc.)
+├── config/              # App configurations
+│   └── constants/       # App constants
+├── types/               # TypeScript types
+├── hooks/               # Custom React hooks
+├── pages/               # Page components
+├── context/             # Context providers
+└── utils/               # Helper functions
+```
 
-Install the dependencies:
+## 🚀 Main Functionality
+
+### 1. Intelligent AI Chat System
+
+- **Context-aware Conversations**: Automatically processes previous messages to maintain natural and coherent dialogue.
+
+- **Streaming Responses**: Displays AI replies in real time for a smoother chat experience.
+
+- **Message History Management**: Stores and loads conversations efficiently.
+
+### 2. UI/UX Features
+
+- **Responsive Design**: Works on both mobile and desktop
+- **Dark Mode Support**: Support dark theme
+
+## 🔧 Install and Run
+
+### System Requirement
+
+- Node.js 18+
+- Yarn or npm
+- Git
+
+### Dependencies Install
 
 ```bash
+yarn install
+
 npm install
 ```
 
+### Environment Variable
+
+Create a .env file with the following:
+
+```env
+DATABASE_URL
+JWT_SECRET_KEY=""
+OLLAMA_API_KEY=""
+OLLAMA_AI_MODEL=""
+REDIS_URL=""
+```
+
+### Run Project
+
+```bash
+# Development mode
+yarn dev
+
+# Testing
+yarn test
+
+# Build production
+yarn build
+
+# Preview build
+yarn preview
+
+# Format code
+yarn format
+```
+
+## 📱 Main Page
+
+### Public Routes
+
+- **Login** (`/login`): Login
+- **Register** (`/register`): Register
+
+### Protected Routes
+
+- **Dashboard** (`/:id?`): Chat page
+
+## 🎨 UI Components
+
+### Base Components
+
+- **Separator**: Separate section
+- **DropDownMenu**: Drop down menu
+- **FormField**: Text input
+
+### Custom Hooks
+
+- **useInfiniteScroll**: Infinite scrolling cho lists
+
+## 📱 Responsive Design
+
+- **Breakpoints**: Tailwind CSS responsive utilities
+- **Touch Friendly**: Optimized for touch devices
+- **Flexible Layouts**: Adaptive layouts along to screen size
+
+## 🧪 Development Tools
+
+- **Prettier**: Code formatting
+- **TypeScript**: Type safety and IntelliSense
+- **Vite**: Fast development server and HMR
+
+## 📦 Build & Deployment
+
 ### Development
 
-Start the development server with HMR:
+- **Hot Module Replacement**: Update code immediately
+- **Source Maps**: Debug with browser dev tools
+- **Fast Refresh**: React component hot reload
 
-```bash
-npm run dev
-```
+## 🔄 Version Control
 
-Your application will be available at `http://localhost:5173`.
+- **Git Flow**: Feature branches and release management
+- **Commit Convention**: Conventional commits
+- **Code Review**: Pull request workflow
 
-## Building for Production
+## 📚
 
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- [React Documentation](https://react.dev/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Vite Guide](https://vitejs.dev/guide/)
+- [Tailwind CSS](https://tailwindcss.com/docs)

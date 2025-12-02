@@ -5,9 +5,18 @@ import Separator from "~/components/ui/Separator";
 import GoogleIcon from "~/assets/icons/google.svg?react";
 import type { Route } from "./+types/sign-in";
 import prisma from "~/config/db";
-import { createTokens } from "~/utils/jwt.service";
+import { commitSession, getSession } from "~/sessions.server";
+
+export async function loader({ request }: Route.LoaderArgs) {
+    const session = await getSession(request.headers.get("Cookie"));
+
+    if (session.has("userId")) {
+        return redirect("/");
+    }
+}
 
 export async function action({ request }: Route.ActionArgs) {
+    const session = await getSession(request.headers.get("Cookie"));
     const formData = await request.formData();
 
     const payload = {
@@ -24,27 +33,23 @@ export async function action({ request }: Route.ActionArgs) {
         omit: {
             password: true
         }
-    });
+    }); 
 
-    const { accessToken, refreshToken, refreshExp, accessExp } = createTokens(user.id);
+    session.set("userId", user.id);
 
     return redirect("/", {
-        headers: [
-            [
-                "Set-Cookie",
-                `refresh_token=${refreshToken}; HttpOnly; Path=/; Expires=${new Date(refreshExp * 1000).toUTCString()}; Secure; SameSite=Strict`
-            ],
-            [
-                "Set-Cookie",
-                `access_token=${accessToken}; HttpOnly; Path=/; Expires=${new Date(accessExp * 1000).toUTCString()}; Secure; SameSite=Strict`
-            ]
-        ]
+        headers: {
+            "Set-Cookie": await commitSession(session)
+        }
     });
 }
 
 const SignUp = () => {
     return (
-        <Form method="POST" className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5">
+        <Form
+            method="POST"
+            className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5"
+        >
             <div className="flex-col flex gap-4">
                 <span className="flex items-center gap-2 text-lg text-text-primary font-semibold">
                     <BotIcon className="w-8 h-8" />

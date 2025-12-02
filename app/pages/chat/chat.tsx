@@ -156,7 +156,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         initialCursor: nextCursor,
         initialData: messages,
         dataKey: "messages",
-        endpoint: `/api/messages/${param.id}`
+        endpoint: `/api/v1/messages/${param.id}`
     });
 
     const [prompt, setPrompt] = React.useState<string>("");
@@ -200,20 +200,12 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     }, [fetcher.state]);
 
     return (
-        <div className="w-full max-h-screen h-screen flex flex-col">
-            {/* Header */}
-            <div className="w-full flex bg-surface h-20 items-center px-6 border-b border-border">
-                <h2 className="font-bold text-2xl text-text-primary">
-                    {conversationDetails?.title || "New Chat"}
-                </h2>
-            </div>
-
-            {/* Content */}
+        <div className="w-full max-h-screen h-screen flex flex-col overflow-hidden">
             <div className="flex flex-col flex-1 bg-base">
                 <div
                     ref={scrollRef}
                     className={clsx(
-                        "flex overflow-y-auto w-full flex-1 gap-8 pl-12 pr-12 pt-6 pb-12",
+                        "flex overflow-y-auto w-full flex-1 gap-8 sm:px-12 px-6 pt-6 pb-12",
                         param?.id ? "flex-col-reverse" : "flex-col items-center justify-center"
                     )}
                     style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT} - 64px - 12px)` }}
@@ -231,8 +223,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                         </React.Fragment>
                     ) : (
                         <React.Fragment>
-                            <h2 className="font-bold text-7xl text-text-primary">Welcome to Script</h2>
-                            <p className="text-lg text-text-secondary">
+                            <h2 className="font-bold sm:text-7xl text-4xl text-text-primary">
+                                Welcome to Script
+                            </h2>
+                            <p className="sm:text-lg text-text-secondary text-center">
                                 Start by Script, a smart chat assistant designed to answer questions and make
                                 conversations seamless and engaging.
                             </p>
@@ -243,7 +237,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
                     {isLoading && <LoadingIndicator className="mb-3" />}
                 </div>
-                <div className="px-12">
+                <div className="sm:px-12 px-6">
                     <div className="self-end rounded-xl border border-border h-16 w-full text-text-primary relative">
                         <fetcher.Form
                             method="POST"

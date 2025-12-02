@@ -8,7 +8,7 @@ export default [
         route("login", "./pages/auth/sign-in.tsx")
     ]),
 
-    route("api/conversations", "./api/conversations.tsx"),
-    route("api/messages/:id", "./api/messages.tsx"),
-    route("api/logout", "./api/logout.tsx")
+    route("api/v1/conversations", "./api/v1/conversations.tsx"),
+    route("api/v1/messages/:id", "./api/v1/messages.tsx"),
+    route("api/v1/logout", "./api/v1/logout.tsx")
 ] satisfies RouteConfig;

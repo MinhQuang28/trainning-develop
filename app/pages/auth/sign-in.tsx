@@ -7,9 +7,19 @@ import type { Route } from "./+types/sign-in";
 import prisma from "~/config/db";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
-import { createTokens } from "~/utils/jwt.service";
+import { commitSession, getSession } from "~/sessions.server";
+
+export async function loader({ request }: Route.LoaderArgs) {
+    const session = await getSession(request.headers.get("Cookie"));
+
+    if (session.has("userId")) {
+        return redirect("/");
+    }
+}
 
 export async function action({ request }: Route.ActionArgs) {
+    const session = await getSession(request.headers.get("Cookie"));
+
     const formData = await request.formData();
     const payload = {
         email: formData.get("email") as string,
@@ -43,7 +53,6 @@ export async function action({ request }: Route.ActionArgs) {
             email: payload.email
         }
     });
-    console.log('🚀 ~ action ~ user:', user)
 
     if (!user) {
         return {
@@ -63,19 +72,12 @@ export async function action({ request }: Route.ActionArgs) {
         };
     }
 
-    const { accessToken, refreshToken, refreshExp, accessExp } = createTokens(user.id);
+    session.set("userId", user.id);
 
     return redirect("/", {
-        headers: [
-            [
-                "Set-Cookie",
-                `refresh_token=${refreshToken}; HttpOnly; Path=/; Expires=${new Date(refreshExp * 1000).toUTCString()}; Secure; SameSite=Strict`
-            ],
-            [
-                "Set-Cookie",
-                `access_token=${accessToken}; HttpOnly; Path=/; Expires=${new Date(accessExp * 1000).toUTCString()}; Secure; SameSite=Strict`
-            ]
-        ]
+        headers: {
+            "Set-Cookie": await commitSession(session)
+        }
     });
 }
 
@@ -88,7 +90,7 @@ const SignIn = () => {
             className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5"
         >
             <div className="flex-col flex gap-4">
-                <span className="flex items -center gap-2 text-lg text-text-primary font-semibold">
+                <span className="flex items-center gap-2 text-lg text-black font-semibold">
                     <BotIcon className="w-8 h-8" />
                     Script
                 </span>
@@ -103,7 +105,7 @@ const SignIn = () => {
                 </div>
             </div>
             <button
-                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-hover border border-border rounded-lg flex items-center justify-center gap-2 text-text-primary w-full"
+                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-hover border border-border rounded-lg flex items-center justify-center gap-2 text-black w-full"
                 type="button"
                 onClick={() => {}}
             >

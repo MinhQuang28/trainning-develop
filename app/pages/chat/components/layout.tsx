@@ -8,6 +8,8 @@ import ApiResponse from "~/types/response";
 import useInfinityScroll from "~/hooks/useInfinityScroll";
 import SideBar from "./SideBar";
 import { SIDEBAR_CONVERSATIONS_LIMIT } from "~/config/constant";
+import MobileSideBar from "./MobileSideBar";
+import { ChevronsRightIcon } from "lucide-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const user = await requiresUserAuthentication(request);
@@ -52,13 +54,14 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
     const [isSideBarOpen, setIsSideBarOpen] = React.useState<boolean>(true);
     const { conversations, user, nextCursor, hasMore: initialHasMore } = loaderData.data;
     const param = useParams();
+    const conversationDetails = conversations.find((conversation) => conversation.id === param.id) || null;
 
     const { scrollRef, observerRef, isLoading, hasMore, data, reset } = useInfinityScroll({
         initialData: conversations,
         initialCursor: nextCursor,
         initialHasMore,
         dataKey: "conversations",
-        endpoint: "/api/conversations"
+        endpoint: "/api/v1/conversations"
     });
 
     React.useEffect(() => {
@@ -66,7 +69,7 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
     }, [param.id]);
 
     return (
-        <div className="flex">
+        <div className="flex overflow-hidden h-screen w-screen">
             <SideBar
                 observerRef={observerRef}
                 scrollRef={scrollRef}
@@ -77,8 +80,32 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
                 activeConversationId={param?.id}
                 hasMoreConversations={hasMore}
                 isLoading={isLoading}
+                className="sm:flex hidden"
             />
-            <Outlet />
+            <MobileSideBar
+                observerRef={observerRef}
+                scrollRef={scrollRef}
+                open={isSideBarOpen}
+                onToggle={setIsSideBarOpen}
+                conversations={data}
+                userDetails={user}
+                activeConversationId={param?.id}
+                hasMoreConversations={hasMore}
+                isLoading={isLoading}
+                className="sm:hidden flex"
+            />
+            <div className="flex-col h-screen max-h-screen overflow-hidden bg-base w-full">
+                <div className="w-full flex bg-surface h-20 items-center px-6 border-b border-border">
+                    <h2 className="font-bold sm:text-2xl text-lg text-text-primary max-sm:flex max-sm:items-center max-sm:justify-center max-sm:gap-3">
+                        <button disabled={isSideBarOpen} onClick={() => setIsSideBarOpen(true)} className="max-sm:block hidden">
+                            <ChevronsRightIcon />
+                        </button>
+                        {conversationDetails?.title || "New Chat"}
+                    </h2>
+                </div>
+
+                <Outlet />
+            </div>
         </div>
     );
 };

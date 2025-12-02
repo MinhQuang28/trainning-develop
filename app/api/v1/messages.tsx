@@ -1,8 +1,8 @@
 import { requiresUserAuthentication } from "~/utils/auth.service";
 import prisma from "~/config/db";
 import { StatusCodes } from "http-status-codes";
-import type { Route } from "./+types/messages";
 import { MESSAGE_LIMIT } from "~/config/constant";
+import type { Route } from "./+types/messages";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
     await requiresUserAuthentication(request);

@@ -24,7 +24,8 @@ const ThemeToggle = ({ state, className, onStateChange }: ThemeToggleProps) => {
             {/* Dark button */}
             <div
                 className="basis-1/2 text-gray-700 cursor-pointer flex rounded-lg p-1 gap-2 items-center justify-center font-medium text-sm"
-                onClick={() => onStateChange("dark")}
+                onClick={() =>{
+                    onStateChange("dark")}}
             >
                 <MoonIcon className="h-5 w-5" />
                 Dark

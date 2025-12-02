@@ -76,7 +76,7 @@ export const generateAnswer = async (prompt: string, context: any) => {
     }
 
     return await ollama.chat({
-        model: "gpt-oss:120b-cloud",
+        model: process.env.OLLAMA_AI_MODEL as string,
         messages: [
             {
                 role: "user",
