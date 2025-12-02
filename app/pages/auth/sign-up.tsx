@@ -1,8 +1,46 @@
 import { BotIcon } from "lucide-react";
-import { Form, Link } from "react-router";
+import { Form, Link, redirect } from "react-router";
 import FormField from "~/components/ui/FormField";
 import Separator from "~/components/ui/Separator";
 import GoogleIcon from "~/assets/icons/google.svg?react";
+import type { Route } from "./+types/sign-in";
+import prisma from "~/config/db";
+import { createTokens } from "~/utils/jwt.service";
+
+export async function action({ request }: Route.ActionArgs) {
+    const formData = await request.formData();
+
+    const payload = {
+        firstName: formData.get("firstName") as string,
+        lastName: formData.get("lastName") as string,
+        email: formData.get("email") as string,
+        password: formData.get("password") as string
+    };
+
+    const user = await prisma.users.create({
+        data: {
+            ...payload
+        },
+        omit: {
+            password: true
+        }
+    });
+
+    const { accessToken, refreshToken, refreshExp, accessExp } = createTokens(user.id);
+
+    return redirect("/", {
+        headers: [
+            [
+                "Set-Cookie",
+                `refresh_token=${refreshToken}; HttpOnly; Path=/; Expires=${new Date(refreshExp * 1000).toUTCString()}; Secure; SameSite=Strict`
+            ],
+            [
+                "Set-Cookie",
+                `access_token=${accessToken}; HttpOnly; Path=/; Expires=${new Date(accessExp * 1000).toUTCString()}; Secure; SameSite=Strict`
+            ]
+        ]
+    });
+}
 
 const SignUp = () => {
     return (
@@ -40,7 +78,7 @@ const SignUp = () => {
                 <FormField name="lastName" label="Last name" />
             </div>
             <FormField name="email" label="Email" />
-            <FormField name="password" label="Password" />
+            <FormField name="password" label="Password" type="password" />
 
             <button type="submit" className="py-3 h-fit cursor-pointer bg-black rounded-lg text-white">
                 Register

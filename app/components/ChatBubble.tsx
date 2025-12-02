@@ -3,7 +3,17 @@ import Avatar from "boring-avatars";
 import clsx from "clsx";
 import { CheckIcon, CopyIcon } from "lucide-react";
 
-const ChatBubble = ({ message, className }: any) => {
+type ChatBubbleProps = {
+    message: {
+        text: string;
+        role: string;
+        isPending?: boolean;
+    };
+    className: string;
+    userDetails: any;
+};
+
+const ChatBubble = ({ message, className, userDetails }: ChatBubbleProps) => {
     const [isCopied, setIsCopied] = React.useState(false);
     const isUser = message.role === "user";
 
@@ -21,16 +31,44 @@ const ChatBubble = ({ message, className }: any) => {
     }, [isCopied]);
 
     return (
-        <div className={clsx("flex gap-2", className, isUser ? "self-end flex-row-reverse" : "self-start")}>
-            <Avatar name="Script" variant="beam" className="h-6 w-6 place-self-end" />
+        <div
+            className={clsx(
+                "flex gap-2 animate-fade-in",
+                className,
+                isUser ? "self-end flex-row-reverse" : "self-start"
+            )}
+        >
+            {isUser ? (
+                <img
+                    src={userDetails?.avatarUrl}
+                    className="h-6 w-6 rounded-full place-self-end"
+                    alt="avatar"
+                />
+            ) : (
+                <Avatar name="Script" variant="beam" className="min-h-6 min-w-6 h-6 w-6 place-self-end" />
+            )}
             <div className="relative">
                 <div
                     className={clsx(
-                        "bg-gray-100 p-3 rounded-lg",
+                        "bg-hover text-text-primary p-3 rounded-lg",
                         isUser ? "rounded-br-none" : "rounded-bl-none"
                     )}
                 >
-                    {message.text}
+                    {message.isPending ? (
+                        <div className="flex gap-2">
+                            {Array.from({ length: 3 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-[#CFD3E4] w-2.5 h-2.5 rounded-full animate-loading"
+                                    style={{
+                                        animationDelay: `${index * 0.1}s`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        message.text
+                    )}
                 </div>
                 <div
                     className={clsx(

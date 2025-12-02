@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "ollama"
+        "ollama",
+        "revalidator"
     ],
     "editor.inlineSuggest.edits.allowCodeShifting": "always"
 }

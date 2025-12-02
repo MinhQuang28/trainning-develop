@@ -21,7 +21,7 @@ const ThemeProviderContext = React.createContext<ThemeProviderState>(initialStat
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const [theme, setTheme] = React.useState<Theme>("light");
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         setTheme((localStorage.getItem("script_theme") as Theme) || "light");
     }, []);
 

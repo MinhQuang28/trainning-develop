@@ -1,5 +1,5 @@
 import { BotIcon } from "lucide-react";
-import { Form, Link, useActionData } from "react-router";
+import { Form, Link, redirect, useActionData } from "react-router";
 import FormField from "~/components/ui/FormField";
 import Separator from "~/components/ui/Separator";
 import GoogleIcon from "~/assets/icons/google.svg?react";
@@ -7,7 +7,7 @@ import type { Route } from "./+types/sign-in";
 import prisma from "~/config/db";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
-import lodash from "lodash";
+import { createTokens, generateJWT } from "~/utils/jwt.service";
 
 export async function action({ request }: Route.ActionArgs) {
     const formData = await request.formData();
@@ -62,17 +62,24 @@ export async function action({ request }: Route.ActionArgs) {
         };
     }
 
-    return {
-        status: StatusCodes.OK,
-        success: true,
-        message: "success",
-        data: { ...lodash.omit(user, "password") }
-    };
+    const { accessToken, refreshToken, refreshExp, accessExp } = createTokens(user.id);
+
+    return redirect("/", {
+        headers: [
+            [
+                "Set-Cookie",
+                `refresh_token=${refreshToken}; HttpOnly; Path=/; Expires=${new Date(refreshExp * 1000).toUTCString()}; Secure; SameSite=Strict`
+            ],
+            [
+                "Set-Cookie",
+                `access_token=${accessToken}; HttpOnly; Path=/; Expires=${new Date(accessExp * 1000).toUTCString()}; Secure; SameSite=Strict`
+            ]
+        ]
+    });
 }
 
 const SignIn = () => {
-    const data = useActionData();
-    console.log("🚀 ~ SignIn ~ data:", data);
+    const response = useActionData();
 
     return (
         <Form
@@ -107,8 +114,8 @@ const SignIn = () => {
                 <p className="opacity-40 text-sm">or</p>
                 <Separator className="data-[orientation=horizontal]:w-[45%]" />
             </div>
-            <FormField name="email" label="Email" error={data?.errors?.email} />
-            <FormField name="password" label="Password" error={data?.errors?.password} />
+            <FormField name="email" label="Email" error={response?.errors?.email} />
+            <FormField name="password" label="Password" type="password" error={response?.errors?.password} />
 
             <button type="submit" className="py-3 h-fit cursor-pointer bg-black rounded-lg text-white">
                 Login
