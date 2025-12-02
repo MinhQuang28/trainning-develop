@@ -7,7 +7,7 @@ import type { Route } from "./+types/sign-in";
 import prisma from "~/config/db";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
-import { createTokens, generateJWT } from "~/utils/jwt.service";
+import { createTokens } from "~/utils/jwt.service";
 
 export async function action({ request }: Route.ActionArgs) {
     const formData = await request.formData();
@@ -43,6 +43,7 @@ export async function action({ request }: Route.ActionArgs) {
             email: payload.email
         }
     });
+    console.log('🚀 ~ action ~ user:', user)
 
     if (!user) {
         return {

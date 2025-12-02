@@ -9,22 +9,27 @@ export const shouldUseWebSearch = (prompt: string): boolean => {
         "when is",
         "where is",
         "price of",
-        "giá",
         "latest",
-        "tin tức",
         "news",
         "update",
-        "sự kiện",
-        "thời sự",
-        "hôm nay",
         "today",
         "real-time",
         "trending",
-        "gpt-oss",
         "ollama",
         "model",
         "company",
-        "framework"
+        "search for",
+        "tin tức",
+        "giá",
+        "sự kiện",
+        "thời sự",
+        "hôm nay",
+        "tìm kiếm",
+        "tìm thông tin về",
+        "tìm trên trình duyệt",
+        "là ai",
+        "là gì",
+        "ở đâu"
     ];
 
     const urlPattern = /(https?:\/\/[^\s]+)/i;
@@ -37,7 +42,7 @@ export const shouldUseWebSearch = (prompt: string): boolean => {
         return true;
     }
 
-    const factualHint = ["bao nhiêu", "how many", "how much", "tỷ lệ", "statistics", "company", "product"];
+    const factualHint = ["bao nhiêu", "tỷ lệ", "how many", "how much", "statistics", "company", "product"];
 
     if (factualHint.some((kw) => lower.includes(kw))) return true;
 
@@ -61,7 +66,7 @@ export const generateAnswer = async (prompt: string, context: any) => {
     - Avoid apologizing for previous responses. Instead, indicate that you have updated your knowledge based on new information. 
     - Do not invent or speculate about anything that is not directly supported by the message context. 
     - Keep your responses concise and relevant to the user's questions or the message being composed.
-    - If the prompt contain "WEB SEARCH RESULT" rely on it to response and list the url where the information was founded.
+    - If the prompt contain "WEB SEARCH RESULT" rely on its information to response and list the url where the information was founded.
     `;
 
     let webSearchResult = null;

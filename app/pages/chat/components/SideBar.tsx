@@ -12,7 +12,7 @@ import { SIDE_BAR_COLLAPSE_WIDTH, SIDE_BAR_EXPANDED_WIDTH } from "~/config/const
 import ThemeToggleCollapse from "~/components/ThemeToggleCollapse";
 import { useTheme } from "~/context/ThemeProvider";
 import clsx from "clsx";
-import { Link, useNavigate } from "react-router";
+import { Link, useFetcher, useNavigate } from "react-router";
 import DropdownMenu from "~/components/ui/DropDownMenu";
 import LoadingIndicator from "./LoadingIndicator";
 
@@ -24,7 +24,6 @@ type SideBarProps = {
     userDetails: any;
     scrollRef: React.RefObject<HTMLDivElement | null>;
     observerRef: React.RefObject<HTMLDivElement | null>;
-    onLogout: () => void;
     hasMoreConversations: boolean;
     isLoading: boolean;
 };
@@ -38,16 +37,26 @@ const SideBar = ({
     scrollRef,
     hasMoreConversations,
     isLoading,
-    onToggle,
-    onLogout
+    onToggle
 }: SideBarProps) => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
+    const fetcher = useFetcher();
+
+    const handleLogout = () => {
+        fetcher.submit(
+            {},
+            {
+                method: "post",
+                action: "/api/logout"
+            }
+        );
+    };
 
     const dropdownMenuItems = [
         {
             label: "Logout",
-            action: onLogout,
+            action: handleLogout,
             icon: <LogOutIcon className="size-4 text-destructive" />
         }
     ];

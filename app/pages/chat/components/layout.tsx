@@ -48,11 +48,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
 }
 
-export async function action({ request }: Route.LoaderArgs) {}
-
 const MainLayout = ({ loaderData }: Route.ComponentProps) => {
     const [isSideBarOpen, setIsSideBarOpen] = React.useState<boolean>(true);
-    const fetcher = useFetcher();
     const { conversations, user, nextCursor, hasMore: initialHasMore } = loaderData.data;
     const param = useParams();
 
@@ -63,10 +60,6 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
         dataKey: "conversations",
         endpoint: "/api/conversations"
     });
-
-    const handleLogout = () => {
-        fetcher.load("/api/logout");
-    };
 
     React.useEffect(() => {
         reset();
@@ -82,7 +75,6 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
                 conversations={data}
                 userDetails={user}
                 activeConversationId={param?.id}
-                onLogout={handleLogout}
                 hasMoreConversations={hasMore}
                 isLoading={isLoading}
             />

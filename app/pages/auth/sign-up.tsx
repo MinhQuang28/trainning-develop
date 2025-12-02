@@ -44,7 +44,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 const SignUp = () => {
     return (
-        <Form className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5">
+        <Form method="POST" className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5">
             <div className="flex-col flex gap-4">
                 <span className="flex items-center gap-2 text-lg text-text-primary font-semibold">
                     <BotIcon className="w-8 h-8" />

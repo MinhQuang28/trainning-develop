@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 import type { Route } from "./+types/logout";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function actions({ request }: Route.ActionArgs) {
     return redirect("/login", {
         headers: [
             ["Set-Cookie", "access_token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict"],
