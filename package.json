@@ -19,6 +19,7 @@
     "isbot": "^5.1.31",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.555.0",
+    "ollama": "^0.6.3",
     "pg": "^8.16.3",
     "prisma": "^7.0.0",
     "react": "^19.1.1",

@@ -1,16 +1,28 @@
 import { prisma } from "~/utils/prisma";
 import { randomUUID } from "crypto";
 import { getAuthToken } from "./auth.server";
+import Ollama from "ollama";
 
 const OLLAMA_API_URL = "http://localhost:11434/api/chat";
 const MODEL_NAME = "gpt-oss:20b-cloud"; 
 
+const aiClient = Ollama;
+async function generateTitleFromPrompt(prompt:string) {
+  const response = await aiClient.generate({
+    model: MODEL_NAME,
+    prompt: `Tóm tắt prompt sau thành tiêu đề ngắn: ${prompt}`
+  });
+
+  const text = response.response; 
+  return text?.trim();
+}
+
 export async function createChatSession(request: Request, prompt: string) {
   const auth = getAuthToken(request);
 
-  const chatId =
-    Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
-  const title = prompt.slice(0, 40) + "...";
+  const chatId = Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+  let title = await generateTitleFromPrompt(prompt);
+  if(!title) title = prompt.slice(0,40);
 
   const data: any = { id: chatId, title };
 
