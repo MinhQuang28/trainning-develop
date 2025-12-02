@@ -47,7 +47,7 @@ const SideBar = ({
         fetcher.submit(
             {},
             {
-                method: "post",
+                method: "POST",
                 action: "/api/logout"
             }
         );
