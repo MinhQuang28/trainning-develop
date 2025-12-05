@@ -1,8 +1,10 @@
-import { type RouteConfig, index, route , layout} from "@react-router/dev/routes";
+import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
 export default [
-  layout("routes/layout.tsx", [
-    index("routes/home.tsx"),
-    route("c/:chatId", "routes/chat.tsx"), 
+  index("routes/home.tsx"),
+  route("/auth", "./routes/auth.tsx"),
+  route("/logout", "./routes/logout.tsx"),
+  route("chat", "routes/chat.tsx", [
+    route(":sessionId", "routes/chat.$sessionId.tsx"),
   ]),
 ] satisfies RouteConfig;

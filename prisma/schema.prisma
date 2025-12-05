@@ -1,66 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
 datasource db {
   provider = "postgresql"
 }
-generator client {
-  provider = "prisma-client"
-  output     = "./generated"
-  engineType = "client"
-}
 
-
-enum Role {
-  USER
-  ASSISTANT
-}
-
-model User {
-  id            String         @id @default(cuid())
-  name          String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-
-  auth          Auth?
-  conversations Conversation[]  
-  sessions      Session[]
-}
-
-model Auth{
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  email     String   @unique
-  password  String
-
-  user      User     @relation(fields: [userId], references: [id])
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  refreshToken String  @unique
+model User{
+  id String @id @default(uuid())
+  email String @unique
+  name String
+  password String
   createdAt DateTime @default(now())
-  expiredAt DateTime
-
-  user      User     @relation(fields: [userId], references: [id])
+  sessions ChatSession[]
 }
 
+model ChatSession{
+  id String @id @default(uuid())
+  title String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  message Message[]
+}
 
-model Conversation {
-  id        String    @id @default(cuid())
-  title     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    String
+model Message{
+  id String @id @default(uuid())
+  role String
+  content String
+  createdAt DateTime @default(now())
+  sessionId String
+  session ChatSession @relation(fields:[sessionId], references: [id], onDelete: Cascade)
   
-  messages  Message[]
-  user      User      @relation(fields: [userId], references: [id])
-}
-
-model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  role           Role
-  content        String
-  createdAt      DateTime     @default(now())
-
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
