@@ -4,7 +4,6 @@ import { getSession } from "~/sessions.server";
 
 export async function requiresUserAuthentication(request: Request) {
     const session = await getSession(request.headers.get("Cookie"));
-    console.log("🚀 ~ requiresUserAuthentication ~ session:", session.has("userId"));
 
     if (!session.has("userId")) {
         throw redirect("/login");

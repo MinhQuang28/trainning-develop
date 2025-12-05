@@ -6,6 +6,7 @@ import GoogleIcon from "~/assets/icons/google.svg?react";
 import type { Route } from "./+types/sign-in";
 import prisma from "~/config/db";
 import { commitSession, getSession } from "~/sessions.server";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const session = await getSession(request.headers.get("Cookie"));
@@ -33,7 +34,7 @@ export async function action({ request }: Route.ActionArgs) {
         omit: {
             password: true
         }
-    }); 
+    });
 
     session.set("userId", user.id);
 
@@ -45,13 +46,15 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 const SignUp = () => {
+    const { loginWithRedirect } = useAuth0();
+
     return (
         <Form
             method="POST"
             className="flex flex-col lg:basis-1/2 lg:px-28 md:px-14 px-7 w-full justify-center md:gap-8 gap-5"
         >
             <div className="flex-col flex gap-4">
-                <span className="flex items-center gap-2 text-lg text-text-primary font-semibold">
+                <span className="flex items-center gap-2 text-lg text-black font-semibold">
                     <BotIcon className="w-8 h-8" />
                     Script
                 </span>
@@ -66,9 +69,15 @@ const SignUp = () => {
                 </div>
             </div>
             <button
-                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-hover border border-border rounded-lg flex items-center justify-center gap-2 text-text-primary w-full"
+                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-[#e5e7eb] border border-[#d1d5db] rounded-lg flex items-center justify-center gap-2 text-black w-full"
                 type="button"
-                onClick={() => {}}
+                onClick={() =>
+                    loginWithRedirect({
+                        authorizationParams: {
+                            connection: "google-oauth2"
+                        }
+                    })
+                }
             >
                 <GoogleIcon className="h-5 w-5" />
                 Continue With Google

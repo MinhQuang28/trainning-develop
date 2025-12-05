@@ -18,7 +18,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
         maxAge: 6000,
         path: "/",
         sameSite: "lax",
-        secrets: [process.env.JWT_SECRET_KEY as string],
+        secrets: [process.env.JWT_SECRET_KEY ?? ""],
         secure: true
     }
 });

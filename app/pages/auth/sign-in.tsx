@@ -8,6 +8,7 @@ import prisma from "~/config/db";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { commitSession, getSession } from "~/sessions.server";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const session = await getSession(request.headers.get("Cookie"));
@@ -83,6 +84,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 const SignIn = () => {
     const response = useActionData();
+    const { loginWithRedirect } = useAuth0();
 
     return (
         <Form
@@ -105,9 +107,15 @@ const SignIn = () => {
                 </div>
             </div>
             <button
-                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-hover border border-border rounded-lg flex items-center justify-center gap-2 text-black w-full"
+                className="py-3 h-fit font-medium cursor-pointer bg-transparent hover:bg-[#e5e7eb] border border-[#d1d5db] rounded-lg flex items-center justify-center gap-2 text-black w-full"
                 type="button"
-                onClick={() => {}}
+                onClick={() =>
+                    loginWithRedirect({
+                        authorizationParams: {
+                            connection: "google-oauth2"
+                        }
+                    })
+                }
             >
                 <GoogleIcon className="h-5 w-5" />
                 Continue With Google

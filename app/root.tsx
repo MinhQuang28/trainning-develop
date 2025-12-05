@@ -3,6 +3,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import type { Route } from "./+types/root";
 import "./app.css";
 import ThemeProvider from "./context/ThemeProvider";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -16,6 +17,13 @@ export const links: Route.LinksFunction = () => [
         href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
     }
 ];
+
+export async function loader({ request }: Route.LoaderArgs) {
+    const url = new URL(request.url);
+    const domain = process.env.AUTH0_DOMAIN ?? "";
+    const clientId = process.env.AUTH0_CLIENT_ID ?? "";
+    return { origin: url.origin, domain, clientId };
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -37,8 +45,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
-export default function App() {
-    return <Outlet />;
+export default function App({ loaderData }: Route.ComponentProps) {
+    return (
+        <Auth0Provider
+            domain={loaderData.domain}
+            clientId={loaderData.clientId}
+            authorizationParams={{ redirect_uri: `${loaderData.origin}/callback` }}
+        >
+            <Outlet />
+        </Auth0Provider>
+    );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

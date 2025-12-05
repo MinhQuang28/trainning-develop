@@ -67,16 +67,19 @@ export const generateAnswer = async (prompt: string, context: any) => {
     - Do not invent or speculate about anything that is not directly supported by the message context. 
     - Keep your responses concise and relevant to the user's questions or the message being composed.
     - If the prompt contain "WEB SEARCH RESULT" rely on its information to response and list the url where the information was founded.
+    - Please do not acknowledge saving, recording, or updating any memory. If I tell you something about myself, respond normally without saying you have saved it or updated your records.
     `;
 
     let webSearchResult = null;
 
     if (shouldUseWebSearch(prompt)) {
+        console.log('🚀 ~ generateAnswer ~ prompt:', prompt)
+        // WARNING: This require OLLAMA API KEY. Command: set OLLAMA_API_KEY=
         webSearchResult = await ollama.webSearch({ query: "prompt" });
     }
 
     return await ollama.chat({
-        model: process.env.OLLAMA_AI_MODEL as string,
+        model: process.env.OLLAMA_AI_MODEL ?? "",
         messages: [
             {
                 role: "user",
